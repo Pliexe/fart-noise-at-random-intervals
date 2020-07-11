@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Media;
+using System.Threading.Tasks;
 
 namespace fart_noise_at_random_intervals
 {
@@ -7,6 +8,17 @@ namespace fart_noise_at_random_intervals
     {
         static void Main(string[] args)
         {
+            int minTime = 1;
+            int maxTime = 10;
+            Console.WriteLine("Do you want to set time interval range? Press space to set it or press any other key to use default");
+            if(Console.ReadKey(true).Key == ConsoleKey.Spacebar)
+            {
+                Console.WriteLine("Specify the minimum time of the intervals (seconds): ");
+                minTime = Convert.ToInt32(Console.ReadLine());
+                Console.WriteLine("Specify the maximum time of the intervals (seconds): ");
+                maxTime = Convert.ToInt32(Console.ReadLine());
+            }
+
             Random random = new Random();
 
             SoundPlayer player = new SoundPlayer();
@@ -23,15 +35,24 @@ namespace fart_noise_at_random_intervals
             {
                 Console.WriteLine("Starting...");
 
-                do
+                bool cantCont = true;
+
+                Task.Run(() =>
                 {
-                    int randomTime = random.Next(1, 10) * 1000;
+                    do
+                    {
+                        
+                        int randomTime = random.Next(minTime, maxTime) * 1000;
 
-                    System.Threading.Thread.Sleep(randomTime);
+                        System.Threading.Thread.Sleep(randomTime);
 
-                    Console.WriteLine("Playing sound!");
-                    player.Play();
-                } while (Console.ReadKey(true).Key != ConsoleKey.Spacebar);
+                        Console.WriteLine("Playing sound!");
+                        player.Play();
+                    } while (cantCont);
+                });
+
+                while(Console.ReadKey(true).Key != ConsoleKey.Spacebar) { }
+                cantCont = false;
 
                 Console.WriteLine("Stopping...");
                 start();
